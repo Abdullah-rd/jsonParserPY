@@ -1,0 +1,7 @@
+{
+  "nom": "Redwan",
+  "âge": 20,
+  "ville": "Mostaganem",
+  "est_étudiant": true,
+  "langues": ["Python", "JavaScript"]
+}
