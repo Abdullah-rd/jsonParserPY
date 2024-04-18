@@ -1,0 +1,14 @@
+
+Python JSON:
+
+https://www.w3schools.com/Python/python_json.asp
+
+Python RegEx tutorial:
+
+https://www.guru99.com/python-regular-expressions-complete-tutorial.html
+
+
+
+Python-OS-Module Functions:
+
+https://www.geeksforgeeks.org/os-module-python-examples/
