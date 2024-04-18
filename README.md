@@ -1,7 +1,9 @@
-                         Projet DSS :
-Sujet 8: Valider et parser un fichier JSON en python .
 Réalisé par : 
 Bendahmane Abderrahmane & Benainouna Redouane Abdallah.
+                         
+                         Projet DSS :
+Sujet 8: Valider et parser un fichier JSON en python .
+
 Groupe : 01.
 
 Explication sur le programme développé :
