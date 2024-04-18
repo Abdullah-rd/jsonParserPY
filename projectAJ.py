@@ -2,108 +2,110 @@ import re
 import os
 import json
 
-TOKEN_TYPES = {
-    "LBRACE": r"\{",
-    "RBRACE": r"\}",
-    "LBRACKET": r"\[",
-    "RBRACKET": r"\]",
-    "COLON": r":",
-    "COMMA": r",",
-    "STRING": r'"(?:\\.|[^\\"])*"',
-    "NUMBER": r"\d+(\.\d+)?",
-    "TRUE": r"true",
-    "FALSE": r"false",
-    "NULL": r"null",
+
+jeton_TYPES = {
+    "LACCOLADE": "\{", # Le backslash \ dans les expressions régulières est utilisé pour échapper les caractères ayant une signification spéciale, les traitant ainsi littéralement.
+    "RACCOLADE": "\}",
+    "LCROCHET": "\[",
+    "RCROCHET": "\]",
+    "COLON": ":",
+    "COMMA": ",",
+    "STRING": '"[^"]*"', # Cette expression régulière correspond à une chaîne de caractères entourée de guillemets doubles, qui peut contenir n'importe quel caractère SAUF des guillemets doubles.
+    "NUMBER": "-?\d+(\.\d+)?",  # Cette expression régulière permet de trouver des valeurs numériques, incluant les entiers et les décimaux, avec un signe négatif et un point décimal optionnels.
+    "TRUE": "true",
+    "FALSE": "false",
+    "NULL": "null",
 }
 
 
 
-def tokenize(jsonString):
-    jsonString = jsonString.strip()
-    print("Votre contenu JSON : ", jsonString)
-    tokens = []
 
-    while jsonString:
-        for token_type, pattern in TOKEN_TYPES.items():
-            match = re.match(pattern, jsonString)
+def tokenize(JsonString):
+    JsonString = JsonString.strip()
+    print("Votre contenu JSON : ", JsonString)
+    jetons = []
+
+    while JsonString:
+        for jeton_type, pattern in jeton_TYPES.items():
+            match = re.match(pattern, JsonString)
             if match:
-                token_value = match.group()
-                tokens.append((token_type, token_value))
-                jsonString = jsonString[len(token_value) :].strip()
+                jeton_value = match.group()
+                jetons.append((jeton_type, jeton_value))
+                JsonString = JsonString[len(jeton_value) :].strip()
                 break
-    #print(tokens)
-    return tokens
+    #print(jetons)
+    return jetons
 
 
-def parserTOKENS(tokens):
+def parserjetonS(jetons):
     def parse_object():
         obj = {}
-        token = tokens.pop(0)
+        jeton = jetons.pop(0)
         
-        if token[0] == "RBRACE":
+        if jeton[0] == "RACCOLADE":
             return obj
 
         while True:
-            key = token[1][1:-1]
-            token = tokens.pop(0)
+            cle = jeton[1][1:-1]
+            jeton = jetons.pop(0)
             value = parse_value()
-            obj[key] = value
-            token = tokens.pop(0)
+            obj[cle] = value
+            jeton = jetons.pop(0)
 
-            if token[0] == "RBRACE":
+            if jeton[0] == "RACCOLADE":
                 break
-            elif token[0] == "COMMA":
-                token = tokens.pop(0)
+            elif jeton[0] == "COMMA":
+                jeton = jetons.pop(0)
 
         return obj
 
     def parse_array():
 
         arr = []
-        token = tokens[0]
-        if token[0] == "RBRACKET":
+        jeton = jetons[0]
+        if jeton[0] == "RCROCHET":
             return arr
         while True:
             value = parse_value()
             arr.append(value)
-            token = tokens.pop(0)
-            if token[0] == "RBRACKET":
+            jeton = jetons.pop(0)
+            if jeton[0] == "RCROCHET":
                 break
         return arr
 
 
 
     def parse_value():
-        token = tokens.pop(0)
-        if token[0] == "LBRACE":
+        jeton = jetons.pop(0)
+        if jeton[0] == "LACCOLADE":
             return parse_object()
-        elif token[0] == "LBRACKET":
+        elif jeton[0] == "LCROCHET":
             return parse_array()
-        elif token[0] == "STRING":
-            return token[1][1:-1]
-        elif token[0] == "NUMBER":
-            return float(token[1]) if "." in token[1] else int(token[1])
-        elif token[0] == "TRUE":
+        elif jeton[0] == "STRING":
+            return jeton[1][1:-1]
+        elif jeton[0] == "NUMBER":
+            return float(jeton[1]) if "." in jeton[1] else int(jeton[1])
+        elif jeton[0] == "TRUE":
             return True
-        elif token[0] == "FALSE":
+        elif jeton[0] == "FALSE":
             return False
-        elif token[0] == "NULL":
+        elif jeton[0] == "NULL":
             return None
     value = parse_value()
     return value
 
-# cette fonction est comme un pont entre la tokenisation et parsing
+# cette fonction est comme un pont entre la tokenization et parsing
 
-def parserJSON(jsonString):
-    tokens = tokenize(jsonString)
-    return parserTOKENS(tokens)
+def parserJSON(JsonString):
+    jetons = tokenize(JsonString)
+    return parserjetonS(jetons)
 
 
  # cette fonction valide la chaîne JSON et retourne True si elle est bien formée, False sinon.
 
-def validerJSON(jsonString):
+def validerJSON(JsonString):
     try:
-        json.loads(jsonString)
+        json.loads(JsonString)
         return True
     except ValueError as e:
         print(f"Erreur de validation : {e}")
@@ -112,13 +114,13 @@ def validerJSON(jsonString):
 
 
 
-# cette fonction lit le fichier json et enregistre sa valeur String dans jsonString
+# cette fonction lit le fichier Json et enregistre sa valeur String dans JsonString
 
 def lireJSON(file_path):
     try:
         with open(file_path, "r") as file:
-            jsonString = file.read().strip()
-        return jsonString
+            JsonString = file.read().strip()
+        return JsonString
     except FileNotFoundError:
         print(f"Erreur : fichier '{file_path}' non trouvé.")
     except Exception as e:
@@ -149,19 +151,23 @@ def main():
         return
 
     file_path = os.path.join(dossier_Exemples, file_name)
-    jsonString = lireJSON(file_path)
+    JsonString = lireJSON(file_path)
 
-    if not jsonString:
+    if not JsonString:
         return
 
-    is_valid = validerJSON(jsonString)
+    is_valid = validerJSON(JsonString)
     print(f"La chaîne JSON est-elle valide ? {is_valid}")
 
     if is_valid:
-        res = parserJSON(jsonString)
+        res = parserJSON(JsonString)
         print('La nouvelle structure de données est enregistrée en "res" : ')
         print(res)
-
+        
+        # example1 test print(res["nom"])
+        # example2 test print(res[1])
+        # example3 test print(res["employees"][0]["email"])
+        
 if __name__ == "__main__":
     main()
 
